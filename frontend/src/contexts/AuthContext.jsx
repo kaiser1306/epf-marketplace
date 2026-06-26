@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
-    const response = await api.post('/api/auth/login', { email, password })
+    const response = await api.post('auth/login', { email, password })
     const { user: loggedUser, token: authToken } = response.data
 
     setUser(loggedUser)
@@ -36,12 +36,12 @@ export function AuthProvider({ children }) {
   }
 
   const register = async (data) => {
-    return api.post('/api/auth/register', data)
+    return api.post('auth/register', data)
   }
 
   const logout = async () => {
     try {
-      await api.post('/api/auth/logout')
+      await api.post('auth/logout')
     } catch {
       // On ignore les erreurs : la déconnexion locale doit aboutir quoi qu'il arrive
     }
