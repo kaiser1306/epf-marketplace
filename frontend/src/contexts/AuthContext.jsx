@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../services/api'
-
-const AuthContext = createContext(null)
+import { AuthContext } from '../hooks/useAuth'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -24,7 +23,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
-    const response = await api.post('auth/login', { email, password })
+    const response = await api.post('/api/auth/login', { email, password })
     const { user: loggedUser, token: authToken } = response.data
 
     setUser(loggedUser)
@@ -36,12 +35,18 @@ export function AuthProvider({ children }) {
   }
 
   const register = async (data) => {
-    return api.post('auth/register', data)
+    return api.post('/api/auth/register', data)
+  }
+
+  // Met à jour l'utilisateur courant (state + localStorage), ex: après édition du profil
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser)
+    localStorage.setItem('user', JSON.stringify(updatedUser))
   }
 
   const logout = async () => {
     try {
-      await api.post('auth/logout')
+      await api.post('/api/auth/logout')
     } catch {
       // On ignore les erreurs : la déconnexion locale doit aboutir quoi qu'il arrive
     }
@@ -58,17 +63,10 @@ export function AuthProvider({ children }) {
     loading,
     login,
     register,
+    updateUser,
     logout,
     isAuthenticated: !!token,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === null) {
-    throw new Error('useAuth doit être utilisé à l’intérieur d’un AuthProvider')
-  }
-  return context
 }

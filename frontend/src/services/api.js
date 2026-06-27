@@ -18,12 +18,19 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status
+    const url = error.config?.url ?? ''
 
-    if (status === 401) {
+    // On n'auto-déconnecte PAS sur les routes d'auth : un login échoué renvoie 401
+    // et le composant doit pouvoir afficher "Identifiants invalides".
+    const isAuthRoute = url.includes('/auth/login') || url.includes('/auth/register')
+
+    if (status === 401 && !isAuthRoute) {
       // Session invalide/expirée : on nettoie et on renvoie vers le login
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-      window.location.href = '/login'
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
 
     // 403 et toutes les autres erreurs : on laisse passer
