@@ -50,20 +50,45 @@ Les seeders chargent **CategorySeeder** et **MarketplaceSeeder** (utilisateurs e
 
 ## Lancer l’application
 
+L’application se compose de **deux parties** à démarrer dans **deux terminaux séparés** :
+le backend (API Laravel) et le frontend (SPA React).
+
+### 1. Backend — API Laravel
+
+Prérequis : la base MySQL doit tourner (ex. **MySQL de XAMPP**) et le `.env` doit être configuré (`DB_*`).
+
 ```bash
+# à la racine du projet (epf-marketplace/)
 php artisan serve
 ```
 
-API : `http://localhost:8000/api/...`
+API disponible sur : `http://localhost:8000/api/...`
 
-Pour les en-têtes d’authentification après login/register :
+> Inutile de placer le projet dans `htdocs` : `php artisan serve` embarque son propre serveur web.
+> Seul **MySQL** de XAMPP est requis (Apache facultatif).
 
-```http
-Authorization: Bearer {token}
-Accept: application/json
+### 2. Frontend — React (Vite)
+
+Dans un **second terminal** :
+
+```bash
+cd frontend
+npm install                 
+cp .env.example .env     
+npm run dev
 ```
 
-Les routes `POST /api/auth/register` et `POST /api/auth/login` sont limitées à **10 requêtes par minute et par IP**.
+Interface disponible sur : `http://localhost:5173`
+
+> Le frontend appelle l’API à l’URL définie par `VITE_API_URL`. Pensez à autoriser
+> l’origine du front (`http://localhost:5173`) dans la config CORS de Laravel (`config/cors.php`).
+
+### Connexion
+
+Utilisez un des [comptes de démonstration](#comptes-de-démonstration-après-db-seed) ci-dessus
+(mot de passe `secret12`).
+
+> Les routes `POST /api/auth/register` et `POST /api/auth/login` sont limitées à **10 requêtes par minute et par IP**.
 
 ## Tests
 
@@ -83,6 +108,3 @@ Les tests fonctionnels couvrent une partie du flux marketplace (voir `tests/Feat
 | [docs/VALIDATIONS_AND_ERRORS.md](docs/VALIDATIONS_AND_ERRORS.md) | Validation et codes HTTP |
 | [docs/JSON_RESPONSES_EXAMPLES.md](docs/JSON_RESPONSES_EXAMPLES.md) | Exemples de réponses |
 
-## Licence
-
-Projet éducatif / démonstration — voir la licence du dépôt (MIT par défaut pour le squelette Laravel).
