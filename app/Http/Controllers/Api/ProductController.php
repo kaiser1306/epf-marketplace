@@ -123,6 +123,7 @@ class ProductController extends Controller
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'sale_starts_at' => ['nullable', 'date'],
             'sale_ends_at' => ['nullable', 'date', 'after_or_equal:sale_starts_at'],
+            'quantity' => ['sometimes', 'integer', 'min:0'],
         ]);
 
         $mainPath = $request->file('image')->store('products', 'public');

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('price_at_add', 12, 2);
             $table->timestamps();
 
+            $table->index(['user_id', 'product_id']);
             $table->unique(['user_id', 'product_id']);
         });
     }
