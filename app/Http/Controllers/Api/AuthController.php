@@ -33,9 +33,10 @@ class AuthController extends Controller
             'role' => $data['role'] ?? 'buyer',
             'city' => $data['city'] ?? null,
             'bio' => $data['bio'] ?? null,
+            'email_verified_at' => now(),
         ]);
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', ['*'], now()->addDays(30))->plainTextToken;
 
         return response()->json([
             'user' => $this->userPayload($user),
@@ -65,7 +66,7 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', ['*'], now()->addDays(30))->plainTextToken;
 
         return response()->json([
             'user' => $this->userPayload($user),

@@ -44,6 +44,35 @@ test('inscription avec rôle et profil auth', function (): void {
     ])->assertOk()->assertJsonStructure(['user', 'token', 'message']);
 });
 
+test('la route my-products fonctionne pour un vendeur authentifié', function (): void {
+    $seller = User::factory()->create(['role' => 'seller']);
+    Product::factory()->create(['user_id' => $seller->id, 'status' => 'published']);
+
+    Sanctum::actingAs($seller);
+
+    $this->getJson('/api/products/my-products')->assertOk();
+});
+
+test('une commande peut être soft supprimée et retrouvée via trashed', function (): void {
+    $buyer = User::factory()->create(['role' => 'buyer']);
+    $order = Order::query()->create([
+        'user_id' => $buyer->id,
+        'order_number' => 'ORDER-TRASH-1',
+        'total_amount' => 20,
+        'discount_amount' => 0,
+        'shipping_cost' => 0,
+        'status' => 'pending',
+        'shipping_address' => 'Addr',
+        'shipping_city' => 'City',
+        'shipping_postal_code' => '00000',
+        'shipping_phone' => '0600000000',
+    ]);
+
+    $order->delete();
+
+    expect(Order::withTrashed()->find($order->id))->not->toBeNull();
+});
+
 test('catégories liste et détail par slug', function (): void {
     $cat = Category::factory()->create(['name' => 'Test', 'slug' => 'test-cat']);
 

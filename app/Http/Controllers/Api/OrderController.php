@@ -42,6 +42,9 @@ class OrderController extends Controller
                 if (! $product || $product->status !== 'published') {
                     abort(422, __('Un produit du panier n\'est plus disponible.'));
                 }
+                if ($item->quantity < 1) {
+                    abort(422, __('La quantité doit être supérieure à 0.'));
+                }
                 if ($item->quantity > $product->quantity) {
                     abort(422, __('Stock insuffisant pour :title.', ['title' => $product->title]));
                 }

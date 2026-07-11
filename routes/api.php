@@ -25,10 +25,17 @@ Route::middleware('throttle:auth')->group(function (): void {
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('categories/{category}', [CategoryController::class, 'show']);
 
-Route::get('products', [ProductController::class, 'index']);
-Route::get('products/top-selling', [ProductController::class, 'topSelling']);
-Route::get('products/{product}/reviews', [ReviewController::class, 'index']);
+Route::middleware('throttle:products')->group(function (): void {
+    Route::get('products', [ProductController::class, 'index']);
+    Route::get('products/top-selling', [ProductController::class, 'topSelling']);
+});
+
+Route::middleware(['auth:sanctum', 'not_suspended'])->group(function (): void {
+    Route::get('products/my-products', [ProductController::class, 'myProducts']);
+});
+
 Route::get('products/{product}', [ProductController::class, 'show']);
+Route::get('products/{product}/reviews', [ReviewController::class, 'index']);
 
 Route::get('sellers/{user}', [SellerController::class, 'show']);
 Route::get('sellers/{user}/products', [SellerController::class, 'products']);
@@ -44,7 +51,6 @@ Route::middleware(['auth:sanctum', 'not_suspended'])->group(function (): void {
     Route::get('auth/me', [AuthController::class, 'me']);
     Route::put('auth/profile', [AuthController::class, 'updateProfile']);
 
-    Route::get('products/my-products', [ProductController::class, 'myProducts']);
     Route::get('products/{product}/is-favorite', [ProductController::class, 'isFavorite']);
     Route::post('products/{product}/reviews', [ReviewController::class, 'store']);
 
@@ -77,10 +83,12 @@ Route::middleware(['auth:sanctum', 'not_suspended'])->group(function (): void {
     Route::delete('favorites/{product_id}', [FavoriteController::class, 'remove']);
     Route::get('favorites', [FavoriteController::class, 'index']);
 
-    Route::post('messages', [MessageController::class, 'store']);
-    Route::get('messages/conversations', [MessageController::class, 'conversations']);
-    Route::get('messages/with/{user_id}', [MessageController::class, 'thread']);
-    Route::get('messages/unread-count', [MessageController::class, 'unreadCount']);
+    Route::middleware('throttle:messages')->group(function (): void {
+        Route::post('messages', [MessageController::class, 'store']);
+        Route::get('messages/conversations', [MessageController::class, 'conversations']);
+        Route::get('messages/with/{user_id}', [MessageController::class, 'thread']);
+        Route::get('messages/unread-count', [MessageController::class, 'unreadCount']);
+    });
 });
 
 Route::middleware(['auth:sanctum', 'not_suspended', 'admin'])->prefix('admin')->group(function (): void {
